@@ -3,167 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Special Invitation</title>
+    <title>Canva Design & Music Player</title> 
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            /* Kita kekalkan overflow: hidden untuk menyembunyikan muka surat Canva selain Cover Page */
-            overflow: hidden; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #000;
-        }
-
-        /* OVERLAY (Paling atas) */
-        #overlay {
-            position: absolute; 
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #2b2b2b 0%, #000000 100%);
+        /* Styling (CSS) remains the same as it is not part of the invitation text */
+        body {
+            font-family: Arial, sans-serif;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 999; 
-            color: white;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
             text-align: center;
-            transition: opacity 0.5s ease;
         }
-
-        #guest-name {
-            font-size: 24px;
-            font-weight: bold;
-            color: #f0f0f0;
-            margin-bottom: 20px;
-            max-width: 80%;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-
-        #mulai-btn {
-            padding: 15px 50px;
-            font-size: 18px;
-            letter-spacing: 2px;
-            background-color: #ffffff;
-            color: #000000;
-            border: 1px solid white;
-            border-radius: 50px;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-weight: bold;
-            transition: all 0.3s ease;
+        h1 {
+            color: #00c4cc; /* Canva color */
+        }
+        .canva-link {
+            display: inline-block;
             margin-top: 20px;
-            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            background-color: #00c4cc;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            transition: background-color 0.3s;
         }
-
-        /* CANVA FRAME CONTAINER (Menolak bar navigasi keluar skrin) */
-        #canva-container {
-            width: 100%;
-            /* Ditingkatkan sedikit untuk menolak bar navigasi keluar */
-            height: 105vh; 
-            transform: translateY(-5vh); 
-            
-            overflow: hidden; 
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
-
-        /* CANVA IFRAME */
-        #canva-frame {
-            width: 100%;
-            height: 1000vh; 
-            border: none;
-            display: block;
-            transform: translateY(0); 
-            transition: transform 1.5s ease-in-out;
+        .canva-link:hover {
+            background-color: #009999;
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h1>Welcome! Click to View Your Canva Design</h1>
+        <p>Music will start playing as soon as you interact with this page.</p>
+        
+        <a 
+            id="canvaLink" 
+            href="https://www.canva.com/design/DAG3xhkAhyM/vWPKDfUeSfC_RJKSXVf6bA/view" 
+            target="_blank" 
+            class="canva-link"
+        >
+            Open Canva Design Now 
+        </a>
+    </div>
 
-    <audio id="audio-player" loop>
-        <source src="Syura-M-Daud-Kilau-Gurindam-Jiwa.mp3" type="audio/mpeg">
+    <audio id="backgroundMusic" preload="auto" loop>
+        <source src="Syura-M-Daud-Kilau-Gurindam-Jiwa.mp3" type="audio/mp3"> 
+        <p>Your browser does not support the audio element.</p>
     </audio>
 
-    <div id="canva-container">
-        <iframe 
-            id="canva-frame" 
-            src="https://www.canva.com/design/DAG3xhkAhyM/vWPKDfUeSfC_RJKSXVf6bA/view?embed&controls=false" 
-            allowfullscreen="allowfullscreen" 
-            allow="fullscreen">
-        </iframe>
-    </div>
-    
-    <div id="overlay">
-        <h1>You are cordially invited</h1>
-        <div id="guest-name"></div>
-        <button id="mulai-btn" onclick="openInvitation()">OPEN INVITATION</button>
-    </div>
-
     <script>
-        // Fungsi untuk mendapatkan parameter dari URL (Nama Tetamu)
-        function getGuestName() {
-            const urlParams = new URLSearchParams(window.location.search);
-            let guest = urlParams.get('to');
-            
-            if (guest) {
-                // Gantikan underscores (_) dengan space ( )
-                guest = decodeURIComponent(guest.replace(/_/g, ' '));
-                return Kepada: ${guest};
-            }
-            return 'Kepada: Tetamu Istimewa'; // Nama default
-        }
+        const audio = document.getElementById('backgroundMusic');
+        const canvaLink = document.getElementById('canvaLink');
 
-        // TAMPILKAN NAMA KETIKA LAMAN DIMUAT
-        window.onload = function() {
-            document.getElementById('guest-name').innerText = getGuestName();
-        };
-
-        function openInvitation() {
-            var audio = document.getElementById("audio-player");
-            var overlay = document.getElementById("overlay");
-            var canvaFrame = document.getElementById("canva-frame");
-            var canvaContainer = document.getElementById("canva-container");
-
-            // 1. Cuba mainkan lagu
-            audio.play().then(() => {
-                overlay.style.opacity = "0";
-                setTimeout(function(){
-                    overlay.style.display = "none";
-                }, 500);
-            }).catch(error => {
-                console.log("Audio playback blocked.");
-                overlay.style.display = "none";
+        // --- Kawalan Autoplay/Mula Main ---
+        // Mencuba untuk bermain audio apabila dokumen siap.
+        document.addEventListener('DOMContentLoaded', () => {
+            audio.volume = 0.5; // Tetapkan kelantangan
+            audio.play().catch(error => {
+                console.log("Autoplay Failed: " + error);
+                // Jika autoplay gagal (kerana sekatan pelayar), minta pengguna untuk berinteraksi
+                document.body.addEventListener('click', function handler() {
+                    audio.play().catch(e => console.log("Failed to play after click."));
+                    document.body.removeEventListener('click', handler); // Buang listener selepas main
+                });
             });
-
-            // 2. TENTUKAN POSISI SKROL: Tolak iframe ke page 3
-            const TARGET_POSITION_VH = -200; 
-            
-            // Beri masa untuk Canva load sebelum kita gerak
-            setTimeout(() => {
-                // Gerakkan Iframe ke kedudukan Page 3
-                canvaFrame.style.transform = translateY(${TARGET_POSITION_VH}vh);
-
-                // KEMBALIKAN KONTENA KE POSISI ASAL (penting untuk pandangan normal)
-                canvaContainer.style.transform = 'translateY(0)';
-                canvaContainer.style.height = '100vh'; 
-
-            }, 4000); 
-        }
-
-        // Auto-pause lagu jika user minimize phone atau tukar tab
-        document.addEventListener("visibilitychange", function() {
-            var audio = document.getElementById("audio-player");
-            if (document.hidden) {
-                audio.pause();
-            }
         });
+
+        // --- Kawalan Hentikan Lagu Apabila Keluar ---
+        // 1. Apabila pengguna mengklik pautan ke Canva
+        canvaLink.addEventListener('click', () => {
+            // Hentikan muzik
+            audio.pause();
+            audio.currentTime = 0; // Tetapkan semula ke permulaan
+        });
+
+        // 2. Apabila pengguna cuba meninggalkan halaman
+        window.addEventListener('beforeunload', () => {
+            audio.pause();
+            audio.currentTime = 0;
+        });
+
     </script>
 </body>
 </html>
