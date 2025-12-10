@@ -1,33 +1,32 @@
 <!DOCTYPE html>
-<html lang="ms">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jemputan Khas</title>
+    <title>Special Invitation</title>
     <style>
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
-            overflow: hidden;
+            overflow: hidden; 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #000;
         }
 
-        /* Overlay Skrin Permulaan */
+        /* OVERLAY (Paling atas) */
         #overlay {
-            position: absolute;
+            position: absolute; 
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            /* Warna latar belakang overlay (boleh tukar warna hex di sini) */
             background: linear-gradient(135deg, #2b2b2b 0%, #000000 100%);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 999;
+            z-index: 999; /* Paling tinggi pada permulaan */
             color: white;
             text-align: center;
             transition: opacity 0.5s ease;
@@ -49,26 +48,42 @@
             box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
         }
 
-        #mulai-btn:hover {
-            transform: scale(1.05);
-            background-color: #000;
-            color: #fff;
-        }
-
-        h1 { margin-bottom: 10px; font-weight: 300; }
-        p { margin-bottom: 30px; opacity: 0.8; font-size: 14px; }
-
-        /* Iframe Canva */
-        iframe {
+        /* CANVA FRAME CONTAINER (Tingkap Pandang) */
+        #canva-container {
             width: 100%;
-            height: 100vh;
-            border: none;
-            display: block;
+            height: 100vh; 
+            overflow: hidden; 
             position: absolute;
             top: 0;
             left: 0;
-            z-index: 1;
+            z-index: 1; /* Di bawah lapisan skrol */
         }
+
+        /* CANVA IFRAME */
+        #canva-frame {
+            width: 100%;
+            height: 1000vh; 
+            border: none;
+            display: block;
+            transform: translateY(0); 
+            transition: transform 1.5s ease-in-out;
+        }
+        
+        /* CONTAINER UNTUK MEMBENARKAN SKROL MANUAL SELEPAS KLIK */
+        /* PENTING: Lakukan z-index tinggi tetapi sembunyikan mouse events pada permulaan */
+        #scroll-wrapper {
+            height: 100vh;
+            width: 100%;
+            overflow-y: scroll;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 998; /* Diletakkan di bawah overlay tapi atas Canva pada permulaan */
+            display: none; 
+            /* Perangkap sentuhan/klik: Pastikan tiada sentuhan yang melalui lapisan ini pada permulaan */
+            pointer-events: none; 
+        }
+
     </style>
 </head>
 <body>
@@ -77,36 +92,59 @@
         <source src="Syura-M-Daud-Kilau-Gurindam-Jiwa.mp3" type="audio/mpeg">
     </audio>
 
-    <div id="overlay">
-        <h1>Sila Masuk</h1>
-        <p>Sentuh butang di bawah untuk membuka jemputan</p>
-        <button id="mulai-btn" onclick="bukaJemputan()">BUKA JEMPUTAN</button>
+    <div id="canva-container">
+        <iframe 
+            id="canva-frame" 
+            src="https://www.canva.com/design/DAG3xhkAhyM/vWPKDfUeSfC_RJKSXVf6bA/view?embed&controls=false" 
+            allowfullscreen="allowfullscreen" 
+            allow="fullscreen">
+        </iframe>
+    </div>
+    
+    <div id="scroll-wrapper">
+        <div style="height: 1000vh; width: 100%;"></div>
     </div>
 
-    <iframe 
-        id="canva-frame" 
-        src="https://www.canva.com/design/DAG3xhkAhyM/vWPKDfUeSfC_RJKSXVf6bA/view?embed" 
-        allowfullscreen="allowfullscreen" 
-        allow="fullscreen">
-    </iframe>
+    <div id="overlay">
+        <h1>Welcome</h1>
+        <p>Please click the button below to view the invitation.</p>
+        <button id="mulai-btn" onclick="openInvitation()">OPEN INVITATION</button>
+    </div>
 
     <script>
-        function bukaJemputan() {
+        function openInvitation() {
             var audio = document.getElementById("audio-player");
             var overlay = document.getElementById("overlay");
+            var canvaFrame = document.getElementById("canva-frame");
+            var scrollWrapper = document.getElementById("scroll-wrapper");
             
-            // Cuba mainkan lagu
+            // 1. Cuba mainkan lagu
             audio.play().then(() => {
-                // Jika lagu berjaya main, hilangkan overlay perlahan-lahan
                 overlay.style.opacity = "0";
                 setTimeout(function(){
                     overlay.style.display = "none";
                 }, 500);
             }).catch(error => {
-                console.log("Error main lagu: " + error);
-                // Jika ada error (cth. browser block), tetap buka overlay
+                console.log("Audio playback blocked.");
                 overlay.style.display = "none";
             });
+
+            // 2. TENTUKAN POSISI SKROL: Tolak iframe ke page 3
+            const TARGET_POSITION_VH = -200; 
+
+            // Gerakkan Iframe ke kedudukan Page 3
+            canvaFrame.style.transform = translateY(${TARGET_POSITION_VH}vh);
+
+            // 3. Mendedahkan lapisan skrol manual & membenarkan interaksi
+            scrollWrapper.style.display = 'block';
+            scrollWrapper.style.pointerEvents = 'auto'; // Kunci interaksi pada lapisan ini
+
+            // 4. Skrol manual lapisan skrol
+            setTimeout(() => {
+                // Gunakan scrollTop untuk memulakan skrol dari Page 3
+                scrollWrapper.scrollTop = TARGET_POSITION_VH * -window.innerHeight / 100;
+            }, 1000); 
+
         }
 
         // Auto-pause lagu jika user minimize phone atau tukar tab
@@ -115,9 +153,7 @@
             if (document.hidden) {
                 audio.pause();
             }
-            // Tiada 'else' di sini, bermakna lagu tidak akan autoplay semula jika user kembali ke tab.
         });
     </script>
-
 </body>
 </html>
