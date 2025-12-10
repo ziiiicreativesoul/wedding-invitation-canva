@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jemputan Khas</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #000;
+        }
+
+        /* Overlay Skrin Permulaan */
+        #overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Warna latar belakang overlay (boleh tukar warna hex di sini) */
+            background: linear-gradient(135deg, #2b2b2b 0%, #000000 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            color: white;
+            text-align: center;
+            transition: opacity 0.5s ease;
+        }
+
+        #mulai-btn {
+            padding: 15px 50px;
+            font-size: 18px;
+            letter-spacing: 2px;
+            background-color: #ffffff;
+            color: #000000;
+            border: 1px solid white;
+            border-radius: 50px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+        }
+
+        #mulai-btn:hover {
+            transform: scale(1.05);
+            background-color: #000;
+            color: #fff;
+        }
+
+        h1 { margin-bottom: 10px; font-weight: 300; }
+        p { margin-bottom: 30px; opacity: 0.8; font-size: 14px; }
+
+        /* Iframe Canva */
+        iframe {
+            width: 100%;
+            height: 100vh;
+            border: none;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="audio-player" loop>
+        <source src="Syura-M-Daud-Kilau-Gurindam-Jiwa.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="overlay">
+        <h1>Sila Masuk</h1>
+        <p>Sentuh butang di bawah untuk membuka jemputan</p>
+        <button id="mulai-btn" onclick="bukaJemputan()">BUKA JEMPUTAN</button>
+    </div>
+
+    <iframe 
+        id="canva-frame" 
+        src="https://www.canva.com/design/DAG3xhkAhyM/vWPKDfUeSfC_RJKSXVf6bA/view?embed" 
+        allowfullscreen="allowfullscreen" 
+        allow="fullscreen">
+    </iframe>
+
+    <script>
+        function bukaJemputan() {
+            var audio = document.getElementById("audio-player");
+            var overlay = document.getElementById("overlay");
+            
+            // Cuba mainkan lagu
+            audio.play().then(() => {
+                // Jika lagu berjaya main, hilangkan overlay perlahan-lahan
+                overlay.style.opacity = "0";
+                setTimeout(function(){
+                    overlay.style.display = "none";
+                }, 500);
+            }).catch(error => {
+                console.log("Error main lagu: " + error);
+                // Jika ada error (cth. browser block), tetap buka overlay
+                overlay.style.display = "none";
+            });
+        }
+
+        // Auto-pause lagu jika user minimize phone atau tukar tab
+        document.addEventListener("visibilitychange", function() {
+            var audio = document.getElementById("audio-player");
+            if (document.hidden) {
+                audio.pause();
+            }
+            // Tiada 'else' di sini, bermakna lagu tidak akan autoplay semula jika user kembali ke tab.
+        });
+    </script>
+
+</body>
+</html>
