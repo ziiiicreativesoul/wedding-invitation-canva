@@ -9,12 +9,13 @@
             margin: 0;
             padding: 0;
             height: 100%;
+            /* Kita kekalkan overflow: hidden untuk menyembunyikan muka surat Canva selain Cover Page */
             overflow: hidden; 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #000;
         }
 
-        /* OVERLAY (Paling atas pada permulaan) */
+        /* OVERLAY (Paling atas) */
         #overlay {
             position: absolute; 
             top: 0;
@@ -30,6 +31,17 @@
             color: white;
             text-align: center;
             transition: opacity 0.5s ease;
+        }
+
+        #guest-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #f0f0f0;
+            margin-bottom: 20px;
+            max-width: 80%;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
         }
 
         #mulai-btn {
@@ -48,12 +60,11 @@
             box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
         }
 
-        /* CANVA FRAME CONTAINER (Tingkap Pandang) */
+        /* CANVA FRAME CONTAINER (Menolak bar navigasi keluar skrin) */
         #canva-container {
             width: 100%;
-            /* TINGGI ASAL: Ditingkatkan sedikit untuk menolak bar navigasi keluar */
+            /* Ditingkatkan sedikit untuk menolak bar navigasi keluar */
             height: 105vh; 
-            /* Letakkan kontena 5vh lebih tinggi, menolak bar navigasi keluar */
             transform: translateY(-5vh); 
             
             overflow: hidden; 
@@ -72,19 +83,8 @@
             transform: translateY(0); 
             transition: transform 1.5s ease-in-out;
         }
-        
-        /* CONTAINER UNTUK MEMBENARKAN SKROL MANUAL SELEPAS KLIK */
-        #scroll-wrapper {
-            height: 100vh;
-            width: 100%;
-            overflow-y: scroll;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 2; 
-            display: none; 
-        }
 
+        /* Lapisan skrol manual dibuang dari HTML dan CSS untuk mengelakkan konflik */
     </style>
 </head>
 <body>
@@ -102,22 +102,34 @@
         </iframe>
     </div>
     
-    <div id="scroll-wrapper">
-        <div style="height: 1000vh; width: 100%;"></div>
-    </div>
-
     <div id="overlay">
-        <h1>Welcome</h1>
-        <p>Please click the button below to view the invitation.</p>
+        <h1>You are cordially invited</h1>
+        <div id="guest-name"></div>
         <button id="mulai-btn" onclick="openInvitation()">OPEN INVITATION</button>
     </div>
 
     <script>
+        // Fungsi untuk mendapatkan parameter dari URL (Nama Tetamu)
+        function getGuestName() {
+            const urlParams = new URLSearchParams(window.location.search);
+            let guest = urlParams.get('to');
+            
+            if (guest) {
+                guest = decodeURIComponent(guest.replace(/_/g, ' '));
+                return Kepada: ${guest};
+            }
+            return 'Kepada: Tetamu Istimewa'; // Nama default
+        }
+
+        // TAMPILKAN NAMA KETIKA LAMAN DIMUAT
+        window.onload = function() {
+            document.getElementById('guest-name').innerText = getGuestName();
+        };
+
         function openInvitation() {
             var audio = document.getElementById("audio-player");
             var overlay = document.getElementById("overlay");
             var canvaFrame = document.getElementById("canva-frame");
-            var scrollWrapper = document.getElementById("scroll-wrapper");
             var canvaContainer = document.getElementById("canva-container");
 
             // 1. Cuba mainkan lagu
@@ -137,17 +149,13 @@
             // Gerakkan Iframe ke kedudukan Page 3
             canvaFrame.style.transform = translateY(${TARGET_POSITION_VH}vh);
 
-            // 3. KEMBALIKAN KONTENA KE POSISI ASAL (untuk membetulkan pandangan)
+            // 3. KEMBALIKAN KONTENA KE POSISI ASAL untuk memaparkan Page 3 dengan betul
             canvaContainer.style.transform = 'translateY(0)';
             canvaContainer.style.height = '100vh'; 
 
-            // 4. Mendedahkan lapisan skrol manual
-            scrollWrapper.style.display = 'block';
-
-            // 5. Skrol manual lapisan skrol
-            setTimeout(() => {
-                scrollWrapper.scrollTop = TARGET_POSITION_VH * -window.innerHeight / 100;
-            }, 1000); 
+            // PERHATIAN: Skrol manual di sini kini hilang.
+            // Anda boleh berikan link ini kepada tetamu anda, tetapi mereka tidak boleh skrol ke Page 4 dan seterusnya.
+            // Hanya Page 3 sahaja yang akan kelihatan.
         }
 
         // Auto-pause lagu jika user minimize phone atau tukar tab
