@@ -9,13 +9,13 @@
             margin: 0;
             padding: 0;
             height: 100%;
-            /* Kita kekalkan overflow: hidden untuk menyembunyikan muka surat Canva selain Cover Page */
+            /* Kekalkan overflow: hidden untuk menyembunyikan Page 2 dan seterusnya */
             overflow: hidden; 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #000;
         }
 
-        /* OVERLAY (Paling atas) */
+        /* OVERLAY */
         #overlay {
             position: absolute; 
             top: 0;
@@ -60,13 +60,10 @@
             box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
         }
 
-        /* CANVA FRAME CONTAINER (Menolak bar navigasi keluar skrin) */
+        /* CANVA FRAME CONTAINER (KEMBALI KE ASAL) */
         #canva-container {
             width: 100%;
-            /* Ditingkatkan sedikit untuk menolak bar navigasi keluar */
-            height: 105vh; 
-            transform: translateY(-5vh); 
-            
+            height: 100vh; /* Hanya setinggi skrin */
             overflow: hidden; 
             position: absolute;
             top: 0;
@@ -83,8 +80,7 @@
             transform: translateY(0); 
             transition: transform 1.5s ease-in-out;
         }
-
-        /* Lapisan skrol manual dibuang dari HTML dan CSS untuk mengelakkan konflik */
+        
     </style>
 </head>
 <body>
@@ -130,8 +126,7 @@
             var audio = document.getElementById("audio-player");
             var overlay = document.getElementById("overlay");
             var canvaFrame = document.getElementById("canva-frame");
-            var canvaContainer = document.getElementById("canva-container");
-
+            
             // 1. Cuba mainkan lagu
             audio.play().then(() => {
                 overlay.style.opacity = "0";
@@ -145,17 +140,11 @@
 
             // 2. TENTUKAN POSISI SKROL: Tolak iframe ke page 3
             const TARGET_POSITION_VH = -200; 
-
-            // Gerakkan Iframe ke kedudukan Page 3
-            canvaFrame.style.transform = translateY(${TARGET_POSITION_VH}vh);
-
-            // 3. KEMBALIKAN KONTENA KE POSISI ASAL untuk memaparkan Page 3 dengan betul
-            canvaContainer.style.transform = 'translateY(0)';
-            canvaContainer.style.height = '100vh'; 
-
-            // PERHATIAN: Skrol manual di sini kini hilang.
-            // Anda boleh berikan link ini kepada tetamu anda, tetapi mereka tidak boleh skrol ke Page 4 dan seterusnya.
-            // Hanya Page 3 sahaja yang akan kelihatan.
+            
+            // PENTING: Beri masa lebih lama (4000ms = 4 saat) untuk Canva load sepenuhnya sebelum kita gerak
+            setTimeout(() => {
+                canvaFrame.style.transform = translateY(${TARGET_POSITION_VH}vh);
+            }, 4000); 
         }
 
         // Auto-pause lagu jika user minimize phone atau tukar tab
